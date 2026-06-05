@@ -19,7 +19,7 @@
 
 | 版本 | 链接 | 说明 |
 |---|---|---|
-| **GitHub Pages (静态快照)** | [sentiment-thermometer.pages.dev](https://YOUR_USERNAME.github.io/sentiment-thermometer/) | 无需后端，数据每6小时自动更新 |
+| **GitHub Pages (静态快照)** | [sentiment-thermometer.pages.dev](https://zongrongli.github.io/sentiment-thermometer/) | 无需后端，数据每6小时自动更新 |
 | **本地运行 (完整版)** | `http://localhost:8866` | 实时数据，5分钟刷新频率 |
 
 > ⚠️ GitHub Pages 版本展示的是最近一次数据快照，完整实时版需启动本地后端。
@@ -83,7 +83,7 @@
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/YOUR_USERNAME/sentiment-thermometer.git
+git clone https://github.com/ZongrongLi/sentiment-thermometer.git
 cd sentiment-thermometer
 
 # 2. 安装依赖
@@ -101,7 +101,7 @@ open http://localhost:8866
 1. Fork 本仓库
 2. 进入 Settings → Pages → 选择 **Deploy from branch: `gh-pages`**
 3. 等待 GitHub Actions 自动执行（每 6 小时更新数据快照）
-4. 访问 `https://YOUR_USERNAME.github.io/sentiment-thermometer/`
+4. 访问 `https://zongrongli.github.io/sentiment-thermometer/`
 
 > 第一次部署后，需要手动触发一次 GitHub Actions（Actions → Update Market Data Snapshot → Run workflow）来生成数据快照。
 
