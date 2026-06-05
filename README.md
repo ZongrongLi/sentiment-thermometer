@@ -16,6 +16,10 @@
 </p>
 
 <p align="center">
+  <img src="assets/og-image.png" alt="Global Sentiment Thermometer — preview" width="90%"/>
+</p>
+
+<p align="center">
   <strong>English first.</strong> This README is bilingual and organized as EN → 中文.
 </p>
 

@@ -1,0 +1,63 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0e14"/>
+      <stop offset="1" stop-color="#121826"/>
+    </linearGradient>
+    <linearGradient id="thermo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ef4444"/>
+      <stop offset="0.35" stop-color="#f97316"/>
+      <stop offset="0.65" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#22c55e"/>
+      <stop offset="0.5" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="48" y="48" width="1104" height="534" rx="32" fill="#10141d" stroke="#1e2634"/>
+
+  <g transform="translate(96 96)">
+    <text fill="#9ca3af" font-family="Inter, Arial, sans-serif" font-size="22" letter-spacing="6">OPEN SOURCE · 开源</text>
+    <text y="80" fill="#e8ecf2" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="800">Global Sentiment</text>
+    <text y="146" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="800">Thermometer</text>
+    <text y="196" fill="#c8cdd6" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="500">全球情绪温度计 · US market macro mood, 12 weighted signals</text>
+    <text y="246" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="20">VIX · AAII · Fear &amp; Greed · 10Y-2Y · HY OAS · DXY · Gold · Polymarket · BTC</text>
+
+    <g transform="translate(0 304)">
+      <rect width="240" height="46" rx="14" fill="#1a1f2b" stroke="#1e2634"/>
+      <text x="22" y="29" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="14">COMPOSITE</text>
+      <text x="138" y="32" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">58° Neutral</text>
+
+      <rect x="260" width="200" height="46" rx="14" fill="#1a1f2b" stroke="#1e2634"/>
+      <text x="282" y="29" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="14">VIX</text>
+      <text x="328" y="32" fill="#22c55e" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">15.65</text>
+
+      <rect x="480" width="240" height="46" rx="14" fill="#1a1f2b" stroke="#1e2634"/>
+      <text x="502" y="29" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="14">S&amp;P 500</text>
+      <text x="582" y="32" fill="#e8ecf2" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">7,584.31</text>
+    </g>
+
+    <text y="408" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="18">zongrongli.github.io/sentiment-thermometer</text>
+  </g>
+
+  <g transform="translate(820 110)">
+    <rect width="220" height="380" rx="34" fill="#0f141c" stroke="#1e2634"/>
+    <rect x="92" y="40" width="36" height="222" rx="18" fill="#1e2634" stroke="#2a3445"/>
+    <rect x="92" y="120" width="36" height="142" rx="18" fill="url(#thermo)"/>
+    <circle cx="110" cy="276" r="40" fill="#f97316" stroke="#2a3445" stroke-width="3"/>
+    <text x="110" y="340" text-anchor="middle" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">58°</text>
+    <text x="110" y="362" text-anchor="middle" fill="#9ca3af" font-family="Inter, Arial, sans-serif" font-size="14">Sentiment</text>
+  </g>
+
+  <g transform="translate(96 510)" font-family="Inter, Arial, sans-serif" font-size="14">
+    <rect width="220" height="38" rx="12" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="20" y="24" fill="#e8ecf2" font-weight="700">EN / 中文 toggle</text>
+    <rect x="240" width="240" height="38" rx="12" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="260" y="24" fill="#e8ecf2" font-weight="700">Polymarket macro panel</text>
+    <rect x="500" width="240" height="38" rx="12" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="520" y="24" fill="#e8ecf2" font-weight="700">Auto refresh every 5 min</text>
+  </g>
+</svg>
