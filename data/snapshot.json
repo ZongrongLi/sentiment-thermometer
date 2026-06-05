@@ -8,8 +8,8 @@
   "indicators": {
     "vix": {
       "name": "VIX 恐慌指数",
-      "value": "15.65",
-      "temperature": 81.2,
+      "value": "15.73",
+      "temperature": 80.9,
       "weight": 15
     },
     "put_call": {
@@ -20,26 +20,26 @@
     },
     "hy_oas": {
       "name": "高收益债利差 (OAS)",
-      "value": "2.68",
-      "temperature": 78.5,
+      "value": "2.69",
+      "temperature": 78.4,
       "weight": 10
     },
     "dxy": {
       "name": "美元指数 DXY",
-      "value": "99.2",
-      "temperature": 58.5,
+      "value": "99.34",
+      "temperature": 58.0,
       "weight": 8
     },
     "gold": {
       "name": "黄金 XAU",
-      "value": "4494.6",
-      "temperature": 0.2,
+      "value": "4476.5",
+      "temperature": 0.8,
       "weight": 8
     },
     "ted_spread": {
       "name": "TED 利差",
-      "value": "0.16",
-      "temperature": 92.4,
+      "value": "0.17",
+      "temperature": 91.7,
       "weight": 5
     },
     "aaii_spread": {
@@ -74,47 +74,47 @@
     },
     "prediction_market_heat": {
       "name": "Polymarket 宏观热度",
-      "value": "41.4",
-      "temperature": 41.4,
+      "value": "41.7",
+      "temperature": 41.7,
       "weight": 8
     }
   },
   "market_data": {
     "sp500_price": 7584.31,
     "sp500_change": 0.41,
-    "vix": 15.65,
-    "dxy": 99.2,
-    "gold": 4494.6,
-    "us10y": 4.48
+    "vix": 15.73,
+    "dxy": 99.34,
+    "gold": 4476.5,
+    "us10y": 4.47
   },
   "polymarket": {
-    "fed_no_change_prob": 98.6,
+    "fed_no_change_prob": 98.7,
     "fed_cut_2026_expected": 0.6,
     "iran_peace_prob": 0.0,
-    "bitcoin_target_heat": 69.0,
-    "prediction_market_heat": 41.4,
+    "bitcoin_target_heat": 70.2,
+    "prediction_market_heat": 41.7,
     "panel": {
       "fed_decision": {
         "title": "Fed Decision in June?",
-        "volume24h": 1253479.949895,
-        "no_change": 98.6,
+        "volume24h": 1496109.412273,
+        "no_change": 98.7,
         "cut25": 0.9,
         "cut50": 0.4
       },
       "fed_cuts": {
         "title": "How many Fed rate cuts in 2026?",
-        "volume24h": 149957.940258,
+        "volume24h": 146912.432297,
         "expected_cuts": 0.6
       },
       "iran_peace": {
         "title": "US x Iran permanent peace deal by...?",
-        "volume24h": 3561165.760574,
+        "volume24h": 3450426.646487,
         "peace_prob": 0.0
       },
       "bitcoin": {
         "title": "Bitcoin above ___ on June 5?",
-        "volume24h": 1950845.891367,
-        "heat": 69.0
+        "volume24h": 2009044.6578310002,
+        "heat": 70.2
       }
     }
   },
@@ -175,5 +175,11 @@
       "change": 0.06
     }
   },
-  "timestamp": "2026-06-05T14:07:21.052357"
+  "timestamp": "2026-06-05T14:40:28.286340",
+  "history": [
+    {
+      "date": "2026-06-05",
+      "composite": 58.3
+    }
+  ]
 }

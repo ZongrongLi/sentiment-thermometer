@@ -9,6 +9,7 @@ from pathlib import Path
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+HISTORY_PATH = DATA_DIR / "history.json"
 
 # ── Data sources ──
 _indicator_config = {
@@ -211,7 +212,20 @@ def main():
         "timestamp": datetime.now().isoformat(),
     }
 
+    history = []
+    if HISTORY_PATH.exists():
+        try:
+            history = json.loads(HISTORY_PATH.read_text())
+        except Exception:
+            history = []
+    today = datetime.now().date().isoformat()
+    history = [row for row in history if isinstance(row, dict) and row.get("date") != today]
+    history.append({"date": today, "composite": composite})
+    history = history[-365:]
+    snapshot["history"] = history
+
     (DATA_DIR / "snapshot.json").write_text(json.dumps(snapshot, ensure_ascii=False, indent=2))
+    HISTORY_PATH.write_text(json.dumps(history, ensure_ascii=False, indent=2))
     print(f"[OK] Snapshot written ({len(json.dumps(snapshot))} bytes)")
     print(f"  Composite: {composite}° ({lbl[1]})")
     print(f"  Indicators: {len(indicators)}")

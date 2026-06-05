@@ -17,6 +17,10 @@
   <strong>English first.</strong> This README is bilingual and organized as EN → 中文.
 </p>
 
+<p align="center">
+  <a href="#demo">English</a> · <a href="#中文说明">中文</a>
+</p>
+
 ---
 
 ## Demo
