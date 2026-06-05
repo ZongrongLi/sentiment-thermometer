@@ -1,0 +1,179 @@
+{
+  "composite": 58.3,
+  "label": {
+    "status": "中性",
+    "color": "#eab308",
+    "desc": "市场情绪中性，无明显方向性信号，保持现有仓位"
+  },
+  "indicators": {
+    "vix": {
+      "name": "VIX 恐慌指数",
+      "value": "15.65",
+      "temperature": 81.2,
+      "weight": 15
+    },
+    "put_call": {
+      "name": "Put/Call 比率",
+      "value": "0.66",
+      "temperature": 76.4,
+      "weight": 12
+    },
+    "hy_oas": {
+      "name": "高收益债利差 (OAS)",
+      "value": "2.68",
+      "temperature": 78.5,
+      "weight": 10
+    },
+    "dxy": {
+      "name": "美元指数 DXY",
+      "value": "99.2",
+      "temperature": 58.5,
+      "weight": 8
+    },
+    "gold": {
+      "name": "黄金 XAU",
+      "value": "4494.6",
+      "temperature": 0.2,
+      "weight": 8
+    },
+    "ted_spread": {
+      "name": "TED 利差",
+      "value": "0.16",
+      "temperature": 92.4,
+      "weight": 5
+    },
+    "aaii_spread": {
+      "name": "AAII 牛熊差",
+      "value": "0",
+      "temperature": 41.7,
+      "weight": 12
+    },
+    "fear_greed": {
+      "name": "Fear & Greed 指数",
+      "value": "50",
+      "temperature": 50.0,
+      "weight": 10
+    },
+    "yield_spread": {
+      "name": "10Y-2Y 利差",
+      "value": "0.5",
+      "temperature": 68.2,
+      "weight": 10
+    },
+    "sp500_200ma": {
+      "name": "标普500 vs 200日均线 (%)",
+      "value": "13.6",
+      "temperature": 74.7,
+      "weight": 5
+    },
+    "bitcoin_fg": {
+      "name": "比特币 Fear & Greed",
+      "value": "12",
+      "temperature": 12.0,
+      "weight": 5
+    },
+    "prediction_market_heat": {
+      "name": "Polymarket 宏观热度",
+      "value": "41.4",
+      "temperature": 41.4,
+      "weight": 8
+    }
+  },
+  "market_data": {
+    "sp500_price": 7584.31,
+    "sp500_change": 0.41,
+    "vix": 15.65,
+    "dxy": 99.2,
+    "gold": 4494.6,
+    "us10y": 4.48
+  },
+  "polymarket": {
+    "fed_no_change_prob": 98.6,
+    "fed_cut_2026_expected": 0.6,
+    "iran_peace_prob": 0.0,
+    "bitcoin_target_heat": 69.0,
+    "prediction_market_heat": 41.4,
+    "panel": {
+      "fed_decision": {
+        "title": "Fed Decision in June?",
+        "volume24h": 1253479.949895,
+        "no_change": 98.6,
+        "cut25": 0.9,
+        "cut50": 0.4
+      },
+      "fed_cuts": {
+        "title": "How many Fed rate cuts in 2026?",
+        "volume24h": 149957.940258,
+        "expected_cuts": 0.6
+      },
+      "iran_peace": {
+        "title": "US x Iran permanent peace deal by...?",
+        "volume24h": 3561165.760574,
+        "peace_prob": 0.0
+      },
+      "bitcoin": {
+        "title": "Bitcoin above ___ on June 5?",
+        "volume24h": 1950845.891367,
+        "heat": 69.0
+      }
+    }
+  },
+  "sectors": {
+    "科技": {
+      "symbol": "XLK",
+      "price": 193.17,
+      "change": 0.92
+    },
+    "金融": {
+      "symbol": "XLF",
+      "price": 52.19,
+      "change": -0.0
+    },
+    "能源": {
+      "symbol": "XLE",
+      "price": 58.75,
+      "change": 0.02
+    },
+    "医疗": {
+      "symbol": "XLV",
+      "price": 152.08,
+      "change": -0.28
+    },
+    "工业": {
+      "symbol": "XLI",
+      "price": 176.16,
+      "change": 0.01
+    },
+    "消费循环": {
+      "symbol": "XLY",
+      "price": 117.26,
+      "change": -0.77
+    },
+    "必需消费": {
+      "symbol": "XLP",
+      "price": 82.04,
+      "change": -0.01
+    },
+    "原材料": {
+      "symbol": "XLB",
+      "price": 51.62,
+      "change": -0.35
+    },
+    "房地产": {
+      "symbol": "XLRE",
+      "price": 44.4,
+      "change": 0.05
+    },
+    "公用事业": {
+      "symbol": "XLU",
+      "price": 43.94,
+      "change": -0.14
+    },
+    "通信服务": {
+      "symbol": "XLC",
+      "price": 113.11,
+      "change": 0.06
+    }
+  },
+  "timestamp": "2026-06-05T14:07:21.052357"
+}
