@@ -10,6 +10,8 @@
   <a href="https://github.com/topics/market-sentiment"><img src="https://img.shields.io/badge/topic-market--sentiment-blue?style=flat-square" alt="Topic: Market Sentiment"/></a>
   <a href="https://github.com/topics/trading-tools"><img src="https://img.shields.io/badge/topic-trading--tools-green?style=flat-square" alt="Topic: Trading Tools"/></a>
   <a href="https://github.com/topics/polymarket"><img src="https://img.shields.io/badge/topic-polymarket-orange?style=flat-square" alt="Topic: Polymarket"/></a>
+  <a href="https://zongrongli.github.io/sentiment-thermometer/"><img src="https://img.shields.io/badge/demo-live-black?style=flat-square" alt="Live Demo"/></a>
+  <a href="https://github.com/ZongrongLi/sentiment-thermometer/actions/workflows/update-data.yml"><img src="https://img.shields.io/github/actions/workflow/status/ZongrongLi/sentiment-thermometer/update-data.yml?style=flat-square&label=data%20update" alt="Data Update Workflow"/></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square" alt="License"/></a>
 </p>
 
@@ -127,6 +129,10 @@ This repo is named and tagged so both English and Chinese users can find it for 
 - 全球情绪温度计
 - 美股宏观情绪看板
 - 市场情绪温度计
+
+Recommended GitHub topics:
+
+`market-sentiment`, `macro-dashboard`, `polymarket`, `fear-and-greed`, `vix`, `finance-dashboard`, `trading-tools`, `sentiment-analysis`, `global-sentiment-thermometer`, `meigu-hongguan`, `quanqiu-qingxu-wenduji`
 
 ---
 

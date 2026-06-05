@@ -4,6 +4,40 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Global Sentiment Thermometer | 全球情绪温度计</title>
+<meta name="description" content="Global Sentiment Thermometer — US market macro mood dashboard powered by 12 weighted indicators including VIX, AAII, Fear & Greed, yield curve, HY OAS, DXY, Gold, Polymarket macro heat, and Bitcoin Fear & Greed. Bilingual EN / 中文." />
+<meta name="keywords" content="market sentiment, fear and greed, polymarket, macro dashboard, vix dashboard, market thermometer, 美股情绪, 全球情绪温度计, 市场情绪看板" />
+<meta name="author" content="ZongrongLi" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Global Sentiment Thermometer · 全球情绪温度计" />
+<meta property="og:description" content="Open-source US market macro sentiment dashboard. 12 weighted signals across volatility, rates, credit, geopolitics, crypto, and Polymarket. Bilingual UI." />
+<meta property="og:image" content="https://zongrongli.github.io/sentiment-thermometer/assets/screenshot.svg" />
+<meta property="og:url" content="https://zongrongli.github.io/sentiment-thermometer/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Global Sentiment Thermometer · 全球情绪温度计" />
+<meta name="twitter:description" content="Open-source US market macro sentiment dashboard, 12 weighted signals, bilingual EN / 中文." />
+<meta name="twitter:image" content="https://zongrongli.github.io/sentiment-thermometer/assets/screenshot.svg" />
+<link rel="canonical" href="https://zongrongli.github.io/sentiment-thermometer/" />
+<link rel="alternate" hreflang="en" href="https://zongrongli.github.io/sentiment-thermometer/?lang=en" />
+<link rel="alternate" hreflang="zh" href="https://zongrongli.github.io/sentiment-thermometer/?lang=zh" />
+<link rel="alternate" hreflang="x-default" href="https://zongrongli.github.io/sentiment-thermometer/" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='12'%20fill='%230a0e14'/%3E%3Crect%20x='28'%20y='14'%20width='8'%20height='28'%20rx='4'%20fill='%23eab308'/%3E%3Ccircle%20cx='32'%20cy='46'%20r='10'%20fill='%23f97316'/%3E%3C/svg%3E" />
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Global Sentiment Thermometer",
+  "alternateName": "全球情绪温度计",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "url": "https://zongrongli.github.io/sentiment-thermometer/",
+  "description": "Open-source US market macro sentiment dashboard with 12 weighted indicators including VIX, Polymarket macro heat, and Bitcoin Fear & Greed.",
+  "inLanguage": ["en", "zh"],
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "softwareVersion": "1.0",
+  "author": { "@type": "Person", "name": "ZongrongLi" },
+  "image": "https://zongrongli.github.io/sentiment-thermometer/assets/screenshot.svg"
+}
+</script>
 <style>
   :root {
     --bg: #0a0e14;
@@ -369,7 +403,13 @@ const I18N = {
   }
 };
 
-let currentLang = localStorage.getItem('thermo-lang') || 'en';
+const urlLang = (() => {
+  try {
+    const v = new URLSearchParams(window.location.search).get('lang');
+    return v === 'en' || v === 'zh' ? v : null;
+  } catch { return null; }
+})();
+let currentLang = urlLang || localStorage.getItem('thermo-lang') || 'en';
 let historyData = [];
 let chartDays = 30;
 let isRefreshing = false;
@@ -698,6 +738,7 @@ async function tryLoadSnapshot() {
     const resp = await fetch('./data/snapshot.json?_=' + Date.now(), { cache: 'no-store' });
     if (!resp.ok) throw new Error('snapshot-not-found');
     const data = await resp.json();
+    window.__lastSnapshot = data;
     renderThermometer(data.composite);
     renderIndicators(data.indicators || {});
     renderMarketData(data.market_data || {});
@@ -799,30 +840,6 @@ function setLanguage(lang) {
     document.getElementById('updateTime').textContent = formatDateTime(window.__lastSnapshot.timestamp || '');
   }
 }
-
-const originalTryLoadSnapshot = tryLoadSnapshot;
-tryLoadSnapshot = async function() {
-  try {
-    const resp = await fetch('./data/snapshot.json?_=' + Date.now(), { cache: 'no-store' });
-    if (!resp.ok) throw new Error('snapshot-not-found');
-    const data = await resp.json();
-    window.__lastSnapshot = data;
-    renderThermometer(data.composite);
-    renderIndicators(data.indicators || {});
-    renderMarketData(data.market_data || {});
-    renderPolymarket(data.polymarket || {});
-    renderSectors(data.sectors || {});
-    historyData = Array.isArray(data.history) ? data.history : [];
-    renderChart();
-    document.getElementById('updateTime').textContent = formatDateTime(data.timestamp || '');
-    setButtonMode('pages');
-    return true;
-  } catch {
-    useFallbackData();
-    setButtonMode('snapshot-unavailable');
-    return false;
-  }
-};
 
 document.getElementById('langEn').onclick = () => setLanguage('en');
 document.getElementById('langZh').onclick = () => setLanguage('zh');
