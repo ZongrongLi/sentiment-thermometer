@@ -244,7 +244,7 @@
         <span class="live-dot"></span>
         <span id="updateTime">加载中...</span>
       </div>
-      <button class="refresh-btn" id="refreshBtn" onclick="refreshAll()">🔄 刷新数据</button>
+      <button class="refresh-btn" id="refreshBtn">🔄 刷新数据</button>
     </div>
   </div>
 
@@ -680,10 +680,12 @@ async function tryLoadSnapshot() {
     renderChart();
     document.getElementById('updateTime').textContent = (data.timestamp || '').replace('T', ' ');
     document.getElementById('refreshBtn').textContent = '📡 Pages 快照';
-    document.getElementById('refreshBtn').style.cursor = 'default';
-    document.getElementById('refreshBtn').onclick = () => { tryLoadSnapshot(); };
     return true;
-  } catch { return false; }
+  } catch { 
+    useFallbackData();
+    document.getElementById('refreshBtn').textContent = '⚠️ 快照不可用';
+    return false; 
+  }
 }
 
 let isRefreshing = false;
@@ -780,6 +782,10 @@ function useFallbackData() {
   }
   renderChart();
   document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
+  document.getElementById('refreshBtn').textContent = '🔄 模拟数据';
+  if (!isGithubPages()) {
+    document.getElementById('refreshBtn').onclick = () => { refreshAll(); };
+  }
 }
 
 // ═══════════════════════════════════
@@ -794,12 +800,16 @@ window.addEventListener('resize', () => {
 });
 
 // On GitHub Pages: load snapshot; only use API refresh when backend is available
+// ── Bootstrap ──
 if (isGithubPages()) {
+  // GitHub Pages: load from static snapshot, no live API
   tryLoadSnapshot();
+  document.getElementById('refreshBtn').onclick = () => { tryLoadSnapshot(); };
 } else {
+  // Local backend: live API with auto‑refresh
   refreshAll();
-  // Auto-refresh every 5 minutes (local backend mode only)
   setInterval(refreshAll, 300000);
+  document.getElementById('refreshBtn').onclick = () => { refreshAll(); };
 }
 </script>
 </body>
