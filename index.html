@@ -249,7 +249,7 @@
   </div>
 
   <!-- Error -->
-  <div class="error-bar" id="errorBar"></div>
+  <!-- error bar removed -->
 
   <!-- Main Grid -->
   <div class="main-grid">
@@ -347,9 +347,13 @@ function getChangeColor(change) {
 const API_BASE = '';
 
 async function api(path) {
-  const res = await fetch(API_BASE + path);
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
-  return res.json();
+  try {
+    const res = await fetch(API_BASE + path);
+    if (!res.ok) throw new Error(String(res.status));
+    return await res.json();
+  } catch {
+    return null;
+  }
 }
 
 // ═══════════════════════════════════
@@ -707,6 +711,7 @@ async function refreshAll() {
   try {
     // Fetch temperature and indicators
     const data = await api('/api/temperature');
+    if (!data) { useFallbackData(); return; }
     renderThermometer(data.composite);
     renderIndicators(data.indicators);
     renderMarketData(data.market_data);
@@ -729,7 +734,13 @@ async function refreshAll() {
   try {
     const sectors = await api('/api/sectors');
     renderSectors(sectors);
-  } catch (e) {
+  } catch (e) { console.error('Sector fetch error:', e); }
+
+  // Independent polymarket data fetch
+  try {
+    const pm = await api('/api/polymarket');
+    if (pm) renderPolymarket(pm);
+  } catch (e) { console.error('Polymarket fetch error:', e); }
     console.error('Sector fetch error:', e);
   }
 
