@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>全球情绪温度计 | Global Sentiment Thermometer</title>
+<title>Global Sentiment Thermometer | 全球情绪温度计</title>
 <style>
   :root {
     --bg: #0a0e14;
@@ -22,7 +22,6 @@
     --up: #22c55e;
     --down: #ef4444;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: var(--bg);
@@ -32,10 +31,7 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
-
   .app { max-width: 1500px; margin: 0 auto; padding: 20px 24px; }
-
-  /* ── Header ── */
   .header {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
@@ -46,7 +42,16 @@
   }
   .header-left h1 span { color: var(--hot1); }
   .header-left .subtitle { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
-  .header-right { display: flex; align-items: center; gap: 14px; }
+  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .lang-toggle {
+    display: inline-flex; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .lang-btn {
+    background: transparent; color: var(--text-dim); border: 0; padding: 7px 10px;
+    cursor: pointer; font-size: 12px; font-weight: 600;
+  }
+  .lang-btn.active { background: #252d3a; color: var(--text-bright); }
   .live-dot {
     display: inline-block; width: 7px; height: 7px; border-radius: 50%;
     background: #22c55e; margin-right: 5px; animation: pulse 2s infinite;
@@ -60,16 +65,12 @@
   }
   .refresh-btn:hover { background: #252d3a; border-color: #374151; }
   .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* ── Layout ── */
   .main-grid {
     display: grid;
     grid-template-columns: 340px 1fr;
     gap: 20px;
     margin-bottom: 20px;
   }
-
-  /* ── Thermometer ── */
   .thermo-section {
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
     padding: 24px 20px; display: flex; flex-direction: column; align-items: center;
@@ -78,273 +79,359 @@
     font-size: 12px; color: var(--text-dim); text-transform: uppercase;
     letter-spacing: .05em; margin-bottom: 4px;
   }
-  .thermo-section .section-title {
-    font-size: 14px; font-weight: 600; color: var(--text-bright); margin-bottom: 18px;
-  }
-  .thermo-container { position: relative; width: 70px; height: 280px; display: flex; flex-direction: column; align-items: center; }
+  .thermo-wrap { position: relative; width: 110px; height: 360px; margin: 16px 0 22px; }
   .thermo-track {
-    position: relative; width: 24px; height: 220px; border-radius: 12px;
-    background: var(--gauge-bg); overflow: hidden; border: 2px solid var(--border);
+    position: absolute; left: 50%; transform: translateX(-50%);
+    width: 42px; height: 290px; background: var(--gauge-bg);
+    border-radius: 21px; border: 2px solid #2a3445; overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
   }
   .thermo-fill {
-    position: absolute; bottom: 0; left: 0; right: 0; border-radius: 12px;
-    transition: height 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 50%;
     background: linear-gradient(to top, var(--cold1), var(--cold2), var(--neutral), var(--hot1), var(--hot2));
-    background-size: 100% 500%;
+    transition: height .9s cubic-bezier(.4,0,.2,1);
+    border-radius: 0 0 19px 19px;
   }
   .thermo-bulb {
-    width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--border);
-    margin-top: -3px; position: relative; z-index: 2;
-    transition: background 0.8s; box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 70px; height: 70px; border-radius: 50%; background: var(--neutral);
+    border: 2px solid #2a3445; box-shadow: 0 0 30px rgba(234,179,8,0.25);
+    transition: all .9s ease;
   }
-  .thermo-value { font-size: 40px; font-weight: 800; letter-spacing: -.02em; line-height: 1; transition: color .8s; margin: 10px 0 3px; }
-  .thermo-status { font-size: 16px; font-weight: 600; transition: color .8s; margin-bottom: 2px; }
-  .thermo-desc { font-size: 11px; color: var(--text-dim); text-align: center; line-height: 1.4; max-width: 280px; }
-  .thermo-range-labels {
-    display: flex; justify-content: space-between; width: 100%; margin-top: 6px; font-size: 9px; color: var(--text-dim);
+  .thermo-scale {
+    position: absolute; right: 0; top: 10px; height: 300px; width: 28px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    font-size: 10px; color: var(--text-dim);
   }
-
-  /* ── Indicators Grid ── */
-  .indicators-section { display: flex; flex-direction: column; gap: 16px; }
-  .ind-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
+  .thermo-value {
+    font-size: 44px; font-weight: 800; color: var(--neutral);
+    line-height: 1; letter-spacing: -0.03em;
+  }
+  .thermo-value span { font-size: 22px; font-weight: 700; margin-left: 2px; }
+  .thermo-status { margin-top: 8px; font-size: 17px; font-weight: 700; color: var(--neutral); }
+  .thermo-desc { margin-top: 10px; text-align: center; font-size: 12px; color: var(--text-dim); line-height: 1.55; max-width: 250px; }
+  .right-col { display: flex; flex-direction: column; gap: 20px; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px;
+  }
+  .panel-title {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--text-dim); margin-bottom: 14px;
+  }
+  .stats-row {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  }
+  .stat-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px;
+  }
+  .stat-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: var(--text-bright); }
+  .up { color: var(--up); }
+  .down { color: var(--down); }
+  .indicator-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
   }
   .indicator-card {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px 16px; display: flex; flex-direction: column; transition: border-color .2s;
-    position: relative; overflow: hidden;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 12px; position: relative; overflow: hidden;
   }
-  .indicator-card:hover { border-color: #374151; }
-  .indicator-card .temp-bar {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-    transition: width 0.8s, background 0.8s; border-radius: 0 0 10px 10px;
+  .indicator-header { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .indicator-name { font-size: 11px; color: var(--text); line-height: 1.35; }
+  .indicator-weight { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+  .indicator-value { font-size: 20px; font-weight: 700; color: var(--text-bright); }
+  .indicator-temp { font-size: 11px; margin-top: 6px; font-weight: 600; }
+  .temp-bar {
+    position: absolute; left: 0; bottom: 0; height: 3px;
+    border-radius: 0 3px 3px 0;
   }
-  .indicator-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-  .indicator-name { font-size: 12px; font-weight: 500; color: var(--text-dim); }
-  .indicator-value { font-size: 16px; font-weight: 700; color: var(--text-bright); letter-spacing: -.01em; }
-  .indicator-value .unit { font-size: 11px; font-weight: 400; color: var(--text-dim); margin-left: 2px; }
-  .indicator-temp { font-size: 12px; font-weight: 600; }
-  .indicator-weight { font-size: 10px; color: var(--text-dim); }
-
-  /* ── Market Data Bar ── */
-  .market-bar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .market-item {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 18px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .market-item .label { font-size: 11px; color: var(--text-dim); }
-  .market-item .value { font-size: 16px; font-weight: 700; color: var(--text-bright); }
-  .up { color: var(--up); } .down { color: var(--down); }
-
-  /* ── Chart ── */
-  .chart-section {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 20px; margin-bottom: 20px;
-  }
-  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .chart-header h3 { font-size: 14px; font-weight: 600; color: var(--text-bright); }
-  .chart-controls { display: flex; gap: 6px; }
+  .chart-controls { display: flex; gap: 8px; margin-bottom: 12px; }
   .chart-btn {
-    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
-    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; transition: all .2s;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 6px 10px; font-size: 11px; border-radius: 6px; cursor: pointer;
   }
-  .chart-btn.active { background: var(--surface2); border-color: var(--neutral); color: var(--text-bright); }
-  .chart-btn:hover { border-color: #374151; }
-  .chart-wrapper { position: relative; width: 100%; height: 200px; }
-  .chart-wrapper canvas { width: 100% !important; height: 200px !important; }
-
-  /* ── Sector Heatmap ── */
-  .sector-section {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 20px; margin-bottom: 20px;
+  .chart-btn.active { color: var(--text-bright); border-color: #374151; background: #252d3a; }
+  .chart-wrap { height: 220px; }
+  .bottom-grid {
+    display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px;
   }
-  .sector-section h3 { font-size: 14px; font-weight: 600; color: var(--text-bright); margin-bottom: 14px; }
-  .sector-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 8px;
+  .sector-grid, .poly-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
   }
-  .sector-card {
-    border-radius: 8px; padding: 12px; text-align: center;
-    transition: transform 0.2s; cursor: default;
+  .sector-card, .poly-card {
+    background: var(--surface2); border-radius: 10px; padding: 12px; border: 1px solid var(--border);
   }
-  .sector-card:hover { transform: translateY(-1px); }
-  .sector-card .sect-name { font-size: 11px; font-weight: 500; margin-bottom: 4px; }
-  .sector-card .sect-change { font-size: 14px; font-weight: 700; }
-  .sector-card .sect-price { font-size: 10px; opacity: 0.7; margin-top: 2px; }
-
-  /* ── Polymarket ── */
-  .poly-section {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 20px; margin-bottom: 20px;
-  }
-  .poly-section h3 { font-size: 14px; font-weight: 600; color: var(--text-bright); margin-bottom: 6px; }
-  .poly-sub { font-size: 11px; color: var(--text-dim); margin-bottom: 14px; }
-  .poly-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-  }
-  .poly-card {
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
-  }
-  .poly-title { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; min-height: 34px; }
-  .poly-main { font-size: 22px; font-weight: 800; color: var(--text-bright); line-height: 1; }
-  .poly-meta { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
-  .poly-heat { margin-top: 8px; height: 6px; border-radius: 999px; background: var(--gauge-bg); overflow: hidden; }
+  .sect-name, .poly-title { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  .sect-change, .poly-main { font-size: 18px; font-weight: 700; color: var(--text-bright); }
+  .sect-price, .poly-meta { margin-top: 4px; font-size: 11px; color: var(--text-dim); line-height: 1.45; }
+  .poly-heat { margin-top: 8px; background: #0d1118; border-radius: 999px; height: 6px; overflow: hidden; }
   .poly-heat-fill { height: 100%; border-radius: 999px; }
-  /* ── Loading ── */
-  .loading { text-align: center; padding: 40px; color: var(--text-dim); font-size: 13px; }
-  .spinner {
-    width: 32px; height: 32px; border: 3px solid var(--border);
-    border-top-color: var(--neutral); border-radius: 50%;
-    animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+  @media (max-width: 1200px) {
+    .indicator-grid { grid-template-columns: repeat(3, 1fr); }
+    .sector-grid, .poly-grid { grid-template-columns: repeat(2, 1fr); }
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── Error ── */
-  .error-bar {
-    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 8px; padding: 10px 16px; margin-bottom: 16px;
-    font-size: 12px; color: var(--hot2); display: none;
+  @media (max-width: 900px) {
+    .main-grid, .bottom-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .indicator-grid { grid-template-columns: repeat(2, 1fr); }
   }
-
-  /* ── Responsive ── */
-  @media (max-width: 860px) {
-    .main-grid { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
     .app { padding: 16px; }
-    .thermo-section { padding: 20px; }
-    .ind-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-  }
-  @media (max-width: 480px) {
-    .header { flex-direction: column; align-items: flex-start; }
-    .market-bar { grid-template-columns: repeat(2, 1fr); }
-    .sector-grid { grid-template-columns: repeat(3, 1fr); }
+    .indicator-grid, .sector-grid, .poly-grid, .stats-row { grid-template-columns: 1fr; }
+    .header-right { width: 100%; justify-content: flex-start; }
   }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-  <!-- Header -->
-  <div class="header">
+<div class="app">
+  <header class="header">
     <div class="header-left">
-      <h1><span>全球情绪温度计</span> | US Market Sentiment</h1>
-      <div class="subtitle">综合11项宏观 + 情绪指标 · 实时加权计算</div>
+      <h1 id="appTitle">Global Sentiment <span>Thermometer</span></h1>
+      <div class="subtitle" id="appSubtitle">US macro mood board powered by 12 weighted signals</div>
     </div>
     <div class="header-right">
-      <div class="last-updated">
-        <span class="live-dot"></span>
-        <span id="updateTime">加载中...</span>
+      <div class="lang-toggle" aria-label="Language switcher">
+        <button class="lang-btn active" id="langEn">EN</button>
+        <button class="lang-btn" id="langZh">中文</button>
       </div>
-      <button class="refresh-btn" id="refreshBtn">🔄 刷新数据</button>
+      <div class="last-updated"><span class="live-dot"></span><span id="updateLabel">Last updated</span>: <span id="updateTime">--</span></div>
+      <button class="refresh-btn" id="refreshBtn">Refresh data</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Error -->
-  <!-- error bar removed -->
-
-  <!-- Main Grid -->
   <div class="main-grid">
-    <!-- Thermometer -->
-    <div class="thermo-section" id="thermoSection">
-      <div class="section-label">市场情绪温度</div>
-      <div class="section-title">MACRO THERMOMETER</div>
-      <div class="thermo-container">
-        <div class="thermo-track">
-          <div class="thermo-fill" id="thermoFill" style="height: 50%;"></div>
-        </div>
+    <section class="thermo-section">
+      <div class="section-label" id="thermoSectionLabel">Composite score</div>
+      <div class="thermo-wrap">
+        <div class="thermo-track"><div class="thermo-fill" id="thermoFill"></div></div>
         <div class="thermo-bulb" id="thermoBulb"></div>
+        <div class="thermo-scale"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
       </div>
-      <div class="thermo-value" id="thermoValue">--</div>
-      <div class="thermo-status" id="thermoStatus">加载中</div>
-      <div class="thermo-desc" id="thermoDesc">获取实时市场数据...</div>
-      <div class="thermo-range-labels">
-        <span style="color:var(--cold1)">极度恐慌</span>
-        <span style="color:var(--cold2)">偏冷</span>
-        <span style="color:var(--neutral)">中性</span>
-        <span style="color:var(--hot1)">偏热</span>
-        <span style="color:var(--hot2)">极度贪婪</span>
-      </div>
-    </div>
+      <div class="thermo-value"><span id="thermoValue">50</span><span>°</span></div>
+      <div class="thermo-status" id="thermoStatus">Neutral</div>
+      <div class="thermo-desc" id="thermoDesc">Balanced sentiment with no dominant macro direction.</div>
+    </section>
 
-    <!-- Indicators -->
-    <div class="indicators-section">
-      <div class="ind-grid" id="indGrid">
-        <div class="loading"><div class="spinner"></div>加载指标数据...</div>
-      </div>
+    <div class="right-col">
+      <section class="panel">
+        <div class="panel-title" id="marketSnapshotTitle">Market snapshot</div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label" id="labelSp500">S&P 500</div><div class="stat-value" id="sp500Value">--</div></div>
+          <div class="stat-card"><div class="stat-label" id="labelVix">VIX</div><div class="stat-value" id="vixValue">--</div></div>
+          <div class="stat-card"><div class="stat-label" id="labelDxy">DXY</div><div class="stat-value" id="dxyValue">--</div></div>
+          <div class="stat-card"><div class="stat-label" id="labelGold">Gold</div><div class="stat-value" id="goldValue">--</div></div>
+          <div class="stat-card"><div class="stat-label" id="labelYield">US 10Y</div><div class="stat-value" id="yieldValue">--</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title" id="indicatorPanelTitle">Weighted indicators</div>
+        <div class="indicator-grid" id="indGrid"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title" id="chartPanelTitle">Sentiment trend</div>
+        <div class="chart-controls">
+          <button class="chart-btn active" data-days="30">1M</button>
+          <button class="chart-btn" data-days="90">3M</button>
+          <button class="chart-btn" data-days="365">1Y</button>
+        </div>
+        <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+      </section>
     </div>
   </div>
 
-  <!-- Market Data Bar -->
-  <div class="market-bar" id="marketBar">
-    <div class="market-item"><span class="label">S&P 500</span><span class="value" id="sp500Value">--</span></div>
-    <div class="market-item"><span class="label">VIX 恐慌</span><span class="value" id="vixValue">--</span></div>
-    <div class="market-item"><span class="label">美元指数</span><span class="value" id="dxyValue">--</span></div>
-    <div class="market-item"><span class="label">黄金 XAU</span><span class="value" id="goldValue">--</span></div>
-    <div class="market-item"><span class="label">10Y 美债</span><span class="value" id="yieldValue">--</span></div>
-  </div>
+  <div class="bottom-grid">
+    <section class="panel">
+      <div class="panel-title" id="sectorPanelTitle">Sector heat</div>
+      <div class="sector-grid" id="sectorGrid"></div>
+    </section>
 
-  <!-- History Chart -->
-  <div class="chart-section">
-    <div class="chart-header">
-      <h3>温度趋势</h3>
-      <div class="chart-controls">
-        <button class="chart-btn active" data-days="30" onclick="switchChartDays(30)">1月</button>
-        <button class="chart-btn" data-days="90" onclick="switchChartDays(90)">3月</button>
-        <button class="chart-btn" data-days="365" onclick="switchChartDays(365)">1年</button>
-      </div>
-    </div>
-    <div class="chart-wrapper"><canvas id="tempChart"></canvas></div>
-  </div>
-
-  <!-- Polymarket -->
-  <div class="poly-section">
-    <h3>Polymarket 宏观盘 🎯</h3>
-    <div class="poly-sub">公开预测市场的利率、地缘与加密风险偏好信号，5分钟刷新</div>
-    <div class="poly-grid" id="polyGrid">
-      <div class="loading"><div class="spinner"></div>加载 Polymarket 数据...</div>
-    </div>
-  </div>
-
-  <!-- Sector Heatmap -->
-  <div class="sector-section">
-    <h3>板块热度 🏭</h3>
-    <div class="sector-grid" id="sectorGrid">
-      <div class="loading"><div class="spinner"></div>加载板块数据...</div>
-    </div>
+    <section class="panel">
+      <div class="panel-title" id="polyPanelTitle">Polymarket macro panel</div>
+      <div class="poly-grid" id="polyGrid"></div>
+    </section>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════
-//  COLOR UTILITIES
-// ═══════════════════════════════════
+const I18N = {
+  en: {
+    title: 'Global Sentiment <span>Thermometer</span>',
+    subtitle: 'US macro mood board powered by 12 weighted signals',
+    updateLabel: 'Last updated',
+    refresh: 'Refresh data',
+    loading: 'Loading...',
+    pagesSnapshot: 'Pages snapshot',
+    snapshotUnavailable: 'Snapshot unavailable',
+    fallback: 'Fallback data',
+    thermoSectionLabel: 'Composite score',
+    marketSnapshotTitle: 'Market snapshot',
+    indicatorPanelTitle: 'Weighted indicators',
+    chartPanelTitle: 'Sentiment trend',
+    sectorPanelTitle: 'Sector heat',
+    polyPanelTitle: 'Polymarket macro panel',
+    labels: {
+      extreme_fear: 'Extreme fear',
+      cool: 'Cool',
+      neutral: 'Neutral',
+      hot: 'Hot',
+      extreme_greed: 'Extreme greed'
+    },
+    descs: {
+      extreme_fear: 'Markets look deeply risk-off. Contrarian buyers may start watching for opportunity.',
+      cool: 'Risk appetite is subdued. High-quality assets may become more attractive.',
+      neutral: 'Balanced sentiment with no dominant macro direction.',
+      hot: 'Risk appetite is warming up. Position sizing and profit-taking deserve attention.',
+      extreme_greed: 'Sentiment looks overheated. Defensive posture may be prudent.'
+    },
+    noHistory: 'No history yet — it will populate after enough snapshots are recorded',
+    indicatorNames: {
+      'VIX 恐慌指数': 'VIX Fear Index',
+      'Put/Call 比率': 'Put/Call Ratio',
+      'AAII 牛熊差': 'AAII Bull-Bear Spread',
+      'Fear & Greed 指数': 'Fear & Greed Index',
+      'Fear & Greed': 'Fear & Greed Index',
+      '10Y-2Y 利差': '10Y-2Y Spread',
+      '高收益债利差 (OAS)': 'HY Credit Spread (OAS)',
+      '高收益债利差': 'HY Credit Spread',
+      '美元指数 DXY': 'US Dollar Index DXY',
+      '黄金 XAU': 'Gold XAU',
+      '标普500 vs 200MA': 'S&P 500 vs 200MA',
+      'TED 利差': 'TED Spread',
+      '比特币 Fear & Greed': 'Bitcoin Fear & Greed'
+    },
+    sectors: {
+      '科技': 'Technology', '金融': 'Financials', '能源': 'Energy', '医疗保健': 'Health Care', '工业': 'Industrials',
+      '消费循环': 'Consumer Discretionary', '必需消费': 'Consumer Staples', '原材料': 'Materials', '房地产': 'Real Estate',
+      '公用事业': 'Utilities', '通信服务': 'Communication Services'
+    },
+    polymarket: {
+      fedDecision: 'Fed decision (this month)',
+      noChange: 'no change',
+      cut25: 'Cut 25bp',
+      cut50: 'Cut 50bp',
+      fedCuts: '2026 easing expectations',
+      expectedCuts: 'implied cuts',
+      iranPeace: 'US-Iran peace odds',
+      iranMeta: 'Lower odds imply higher geopolitical risk',
+      bitcoin: 'Crypto speculation heat',
+      aggregate: 'Polymarket macro heat',
+      aggregateMeta: 'Rates + geopolitics + crypto combined'
+    }
+  },
+  zh: {
+    title: '全球情绪<span>温度计</span>',
+    subtitle: '用 12 项加权信号构建的美股宏观情绪看板',
+    updateLabel: '最近更新',
+    refresh: '刷新数据',
+    loading: '加载中...',
+    pagesSnapshot: 'Pages 快照',
+    snapshotUnavailable: '快照不可用',
+    fallback: '回退数据',
+    thermoSectionLabel: '综合温度',
+    marketSnapshotTitle: '市场快照',
+    indicatorPanelTitle: '加权指标',
+    chartPanelTitle: '情绪趋势',
+    sectorPanelTitle: '板块热度',
+    polyPanelTitle: 'Polymarket 宏观看板',
+    labels: {
+      extreme_fear: '极度恐慌',
+      cool: '偏冷',
+      neutral: '中性',
+      hot: '偏热',
+      extreme_greed: '极度贪婪'
+    },
+    descs: {
+      extreme_fear: '市场极度恐慌，往往靠近底部区域，逆向资金可开始留意机会。',
+      cool: '风险偏好偏弱，优质资产的性价比可能提升。',
+      neutral: '情绪中性，没有明显的宏观方向性。',
+      hot: '风险偏好升温，值得注意仓位控制和止盈节奏。',
+      extreme_greed: '市场情绪偏过热，适合更防守一些。'
+    },
+    noHistory: '暂无历史数据，待累计更多快照后显示',
+    indicatorNames: {},
+    sectors: {},
+    polymarket: {
+      fedDecision: 'Fed 决议（本月）',
+      noChange: '不变',
+      cut25: '降25bp',
+      cut50: '降50bp',
+      fedCuts: '2026 降息预期',
+      expectedCuts: '隐含降息次数',
+      iranPeace: '美伊和平概率',
+      iranMeta: '越低代表地缘风险越高',
+      bitcoin: '加密投机热度',
+      aggregate: 'Polymarket 宏观热度',
+      aggregateMeta: '利率 + 地缘 + 加密三类信号聚合'
+    }
+  }
+};
+
+let currentLang = localStorage.getItem('thermo-lang') || 'en';
+let historyData = [];
+let chartDays = 30;
+let isRefreshing = false;
+
+function t() { return I18N[currentLang]; }
+function localizeName(name) { return t().indicatorNames[name] || name; }
+function localizeSector(name) { return t().sectors[name] || name; }
+
+function formatDateTime(value) {
+  if (!value) return '--';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value).replace('T', ' ');
+  return new Intl.DateTimeFormat(currentLang === 'zh' ? 'zh-CN' : 'en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(date);
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  document.getElementById('appTitle').innerHTML = t().title;
+  document.getElementById('appSubtitle').textContent = t().subtitle;
+  document.getElementById('updateLabel').textContent = t().updateLabel;
+  document.getElementById('refreshBtn').textContent = currentButtonLabel();
+  document.getElementById('thermoSectionLabel').textContent = t().thermoSectionLabel;
+  document.getElementById('marketSnapshotTitle').textContent = t().marketSnapshotTitle;
+  document.getElementById('indicatorPanelTitle').textContent = t().indicatorPanelTitle;
+  document.getElementById('chartPanelTitle').textContent = t().chartPanelTitle;
+  document.getElementById('sectorPanelTitle').textContent = t().sectorPanelTitle;
+  document.getElementById('polyPanelTitle').textContent = t().polyPanelTitle;
+  document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
+  document.getElementById('langZh').classList.toggle('active', currentLang === 'zh');
+}
+
+let buttonMode = 'refresh';
+function currentButtonLabel() {
+  if (buttonMode === 'loading') return `⟳ ${t().loading}`;
+  if (buttonMode === 'pages') return `📡 ${t().pagesSnapshot}`;
+  if (buttonMode === 'snapshot-unavailable') return `⚠️ ${t().snapshotUnavailable}`;
+  if (buttonMode === 'fallback') return `🔄 ${t().fallback}`;
+  return t().refresh;
+}
+function setButtonMode(mode) {
+  buttonMode = mode;
+  document.getElementById('refreshBtn').textContent = currentButtonLabel();
+}
+
 function getTempColor(temp) {
-  if (temp <= 20) return { bg: '#0ea5e9', text: '#0ea5e9', stop: 0 };
-  if (temp <= 40) return { bg: '#22c55e', text: '#22c55e', stop: 0.25 };
-  if (temp <= 60) return { bg: '#eab308', text: '#eab308', stop: 0.5 };
-  if (temp <= 80) return { bg: '#f97316', text: '#f97316', stop: 0.75 };
-  return { bg: '#ef4444', text: '#ef4444', stop: 1 };
+  if (temp <= 20) return { bg: '#0ea5e9' };
+  if (temp <= 40) return { bg: '#22c55e' };
+  if (temp <= 60) return { bg: '#eab308' };
+  if (temp <= 80) return { bg: '#f97316' };
+  return { bg: '#ef4444' };
 }
 
-function getChangeColor(change) {
-  if (change > 0) return '#22c55e';
-  if (change < 0) return '#ef4444';
-  return '#6b7280';
+function getLabelAndDesc(temp) {
+  if (temp <= 20) return { label: t().labels.extreme_fear, desc: t().descs.extreme_fear };
+  if (temp <= 40) return { label: t().labels.cool, desc: t().descs.cool };
+  if (temp <= 60) return { label: t().labels.neutral, desc: t().descs.neutral };
+  if (temp <= 80) return { label: t().labels.hot, desc: t().descs.hot };
+  return { label: t().labels.extreme_greed, desc: t().descs.extreme_greed };
 }
-
-// ═══════════════════════════════════
-//  API
-// ═══════════════════════════════════
-const API_BASE = '';
 
 async function api(path) {
   if (isGithubPages()) return null;
@@ -357,58 +444,43 @@ async function api(path) {
   }
 }
 
-// ═══════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════
-
 function renderThermometer(composite) {
   const fill = document.getElementById('thermoFill');
   const bulb = document.getElementById('thermoBulb');
   const value = document.getElementById('thermoValue');
   const status = document.getElementById('thermoStatus');
   const desc = document.getElementById('thermoDesc');
-
-  const temp = Math.max(0, Math.min(100, composite));
+  const temp = Math.max(0, Math.min(100, Number(composite) || 0));
   const color = getTempColor(temp);
-
+  const labelInfo = getLabelAndDesc(temp);
   fill.style.height = temp + '%';
   fill.style.backgroundPosition = `0% ${100 - temp}%`;
   bulb.style.background = color.bg;
   bulb.style.boxShadow = `0 0 20px ${color.bg}40`;
   value.textContent = Math.round(temp);
   value.style.color = color.bg;
-  status.textContent = '';
+  status.textContent = labelInfo.label;
   status.style.color = color.bg;
-
-  const labels = [
-    { max: 20, s: '极度恐慌', d: '市场极度恐慌 — 往往对应底部区域，逆向投资者可关注买入机会 🔵' },
-    { max: 40, s: '偏冷', d: '情绪偏冷 — 估值相对合理，可逐步建仓优质资产 🟢' },
-    { max: 60, s: '中性', d: '情绪中性 — 无明显方向性信号，保持现有仓位 🟡' },
-    { max: 80, s: '偏热', d: '情绪偏热 — 注意控制仓位，考虑部分止盈 🟠' },
-    { max: 100, s: '极度贪婪', d: '极度贪婪 — 往往对应顶部区域，建议减仓防守 🔴' },
-  ];
-  const match = labels.find(l => temp <= l.max) || labels[labels.length - 1];
-  status.textContent = match.s;
-  desc.textContent = match.d;
+  desc.textContent = labelInfo.desc;
 }
 
 function renderIndicators(indicators) {
   const grid = document.getElementById('indGrid');
   grid.innerHTML = '';
-
   Object.entries(indicators).forEach(([id, ind]) => {
-    const color = getTempColor(ind.temperature);
-    const valStr = typeof ind.value === 'number' ? ind.value.toFixed(1) : ind.value;
+    const color = getTempColor(Number(ind.temperature) || 0);
+    const valNum = Number(ind.value);
+    const valStr = Number.isFinite(valNum) ? (Math.abs(valNum) >= 1000 ? valNum.toLocaleString() : valNum.toFixed(1)) : ind.value;
     const card = document.createElement('div');
     card.className = 'indicator-card';
     card.innerHTML = `
       <div class="indicator-header">
-        <span class="indicator-name">${ind.name}</span>
+        <span class="indicator-name">${localizeName(ind.name)}</span>
         <span class="indicator-weight">w${ind.weight}</span>
       </div>
       <div class="indicator-value">${valStr}</div>
-      <div class="indicator-temp" style="color:${color.bg}">${ind.temperature}°</div>
-      <div class="temp-bar" style="width:${ind.temperature}%;background:${color.bg}"></div>
+      <div class="indicator-temp" style="color:${color.bg}">${Number(ind.temperature).toFixed(1)}°</div>
+      <div class="temp-bar" style="width:${Math.max(0, Math.min(100, Number(ind.temperature) || 0))}%;background:${color.bg}"></div>
     `;
     grid.appendChild(card);
   });
@@ -416,53 +488,45 @@ function renderIndicators(indicators) {
 
 function renderMarketData(md) {
   if (!md) return;
-
   const spVal = document.getElementById('sp500Value');
   const vixVal = document.getElementById('vixValue');
   const dxyVal = document.getElementById('dxyValue');
   const goldVal = document.getElementById('goldValue');
   const yieldVal = document.getElementById('yieldValue');
-
   if (md.sp500_price) {
     const change = md.sp500_change || 0;
     const cls = change >= 0 ? 'up' : 'down';
     const sign = change > 0 ? '+' : '';
-    spVal.innerHTML = `${md.sp500_price.toLocaleString()} <span class="${cls}" style="font-size:12px">${sign}${change}%</span>`;
+    spVal.innerHTML = `${Number(md.sp500_price).toLocaleString()} <span class="${cls}" style="font-size:12px">${sign}${change}%</span>`;
   }
   if (md.vix) {
-    vixVal.textContent = md.vix.toFixed(2);
+    vixVal.textContent = Number(md.vix).toFixed(2);
     vixVal.style.color = md.vix > 25 ? '#ef4444' : md.vix < 15 ? '#22c55e' : '#eab308';
   }
-  if (md.dxy) dxyVal.textContent = md.dxy.toFixed(2);
-  if (md.gold) goldVal.textContent = md.gold.toLocaleString();
-  if (md.us10y) yieldVal.textContent = md.us10y.toFixed(2) + '%';
+  if (md.dxy) dxyVal.textContent = Number(md.dxy).toFixed(2);
+  if (md.gold) goldVal.textContent = Number(md.gold).toLocaleString();
+  if (md.us10y) yieldVal.textContent = Number(md.us10y).toFixed(2) + '%';
 }
 
 function renderSectors(sectors) {
   const grid = document.getElementById('sectorGrid');
   grid.innerHTML = '';
-
   Object.entries(sectors).forEach(([name, data]) => {
     const change = data.change || 0;
     const absChange = Math.abs(change);
     const intensity = Math.min(1, absChange / 3);
     const isUp = change >= 0;
-    const bgColor = isUp
-      ? `rgba(34,197,94,${0.1 + intensity * 0.3})`
-      : `rgba(239,68,68,${0.1 + intensity * 0.3})`;
-    const borderColor = isUp
-      ? `rgba(34,197,94,${0.2 + intensity * 0.4})`
-      : `rgba(239,68,68,${0.2 + intensity * 0.4})`;
+    const bgColor = isUp ? `rgba(34,197,94,${0.1 + intensity * 0.3})` : `rgba(239,68,68,${0.1 + intensity * 0.3})`;
+    const borderColor = isUp ? `rgba(34,197,94,${0.2 + intensity * 0.4})` : `rgba(239,68,68,${0.2 + intensity * 0.4})`;
     const sign = isUp ? '+' : '';
-
     const card = document.createElement('div');
     card.className = 'sector-card';
     card.style.background = bgColor;
     card.style.border = `1px solid ${borderColor}`;
     card.innerHTML = `
-      <div class="sect-name" style="color:${isUp ? '#22c55e' : '#ef4444'}">${name}</div>
+      <div class="sect-name" style="color:${isUp ? '#22c55e' : '#ef4444'}">${localizeSector(name)}</div>
       <div class="sect-change">${sign}${change.toFixed(2)}%</div>
-      <div class="sect-price">${data.symbol} ${data.price.toFixed(2)}</div>
+      <div class="sect-price">${data.symbol} ${Number(data.price).toFixed(2)}</div>
     `;
     grid.appendChild(card);
   });
@@ -473,7 +537,6 @@ function renderPolymarket(data) {
   if (!grid) return;
   const panel = (data && data.panel) || {};
   const cards = [];
-
   const addCard = (title, main, meta, heat) => {
     const c = getTempColor(heat ?? 50);
     cards.push(`
@@ -485,94 +548,72 @@ function renderPolymarket(data) {
       </div>
     `);
   };
-
   if (panel.fed_decision) {
     addCard(
-      'Fed 决议（本月）',
-      `${panel.fed_decision.no_change.toFixed(1)}% 不变`,
-      `降25bp ${panel.fed_decision.cut25.toFixed(1)}% · 降50bp ${panel.fed_decision.cut50.toFixed(1)}% · 24h $${Math.round(panel.fed_decision.volume24h).toLocaleString()}`,
+      t().polymarket.fedDecision,
+      `${panel.fed_decision.no_change.toFixed(1)}% ${t().polymarket.noChange}`,
+      `${t().polymarket.cut25} ${panel.fed_decision.cut25.toFixed(1)}% · ${t().polymarket.cut50} ${panel.fed_decision.cut50.toFixed(1)}% · 24h $${Math.round(panel.fed_decision.volume24h).toLocaleString()}`,
       100 - panel.fed_decision.no_change
     );
   }
   if (panel.fed_cuts) {
     addCard(
-      '2026 降息预期',
-      `${panel.fed_cuts.expected_cuts.toFixed(2)} 次`,
-      `Polymarket 隐含全年降息次数 · 24h $${Math.round(panel.fed_cuts.volume24h).toLocaleString()}`,
+      t().polymarket.fedCuts,
+      `${panel.fed_cuts.expected_cuts.toFixed(2)} ${currentLang === 'zh' ? '次' : t().polymarket.expectedCuts}`,
+      `${currentLang === 'zh' ? 'Polymarket 隐含全年降息次数' : 'Polymarket-implied full-year easing'} · 24h $${Math.round(panel.fed_cuts.volume24h).toLocaleString()}`,
       Math.min(100, panel.fed_cuts.expected_cuts * 25)
     );
   }
   if (panel.iran_peace) {
     addCard(
-      '美伊和平概率',
+      t().polymarket.iranPeace,
       `${panel.iran_peace.peace_prob.toFixed(1)}%`,
-      `越低代表地缘风险越高 · 24h $${Math.round(panel.iran_peace.volume24h).toLocaleString()}`,
+      `${t().polymarket.iranMeta} · 24h $${Math.round(panel.iran_peace.volume24h).toLocaleString()}`,
       100 - panel.iran_peace.peace_prob
     );
   }
   if (panel.bitcoin) {
     addCard(
-      '加密投机热度',
+      t().polymarket.bitcoin,
       `${panel.bitcoin.heat.toFixed(1)}°`,
       `${panel.bitcoin.title} · 24h $${Math.round(panel.bitcoin.volume24h).toLocaleString()}`,
       panel.bitcoin.heat
     );
   }
-
   addCard(
-    'Polymarket 宏观热度',
+    t().polymarket.aggregate,
     `${(data.prediction_market_heat || 50).toFixed(1)}°`,
-    `利率 + 地缘 + 加密三类信号聚合`,
+    t().polymarket.aggregateMeta,
     data.prediction_market_heat || 50
   );
-
   grid.innerHTML = cards.join('');
 }
-
-// ═══════════════════════════════════
-//  CHART
-// ═══════════════════════════════════
-
-let historyData = [];
-let chartDays = 30;
-let chartInstance = null;
 
 function renderChart() {
   const canvas = document.getElementById('tempChart');
   if (!canvas) return;
-
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.parentElement.getBoundingClientRect();
-
   canvas.width = rect.width * dpr;
   canvas.height = 200 * dpr;
   canvas.style.width = rect.width + 'px';
   canvas.style.height = '200px';
-  ctx.scale(dpr, dpr);
-
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const w = rect.width;
   const h = 200;
   const pad = { top: 12, right: 16, bottom: 28, left: 32 };
   const pw = w - pad.left - pad.right;
   const ph = h - pad.top - pad.bottom;
-
   ctx.clearRect(0, 0, w, h);
-
-  // Background bands
   const bands = [
-    { y0: 0.8, y1: 1.0, color: 'rgba(14,165,233,0.06)', label: '极度恐慌' },
-    { y0: 0.6, y1: 0.8, color: 'rgba(34,197,94,0.05)', label: '偏冷' },
-    { y0: 0.4, y1: 0.6, color: 'rgba(234,179,8,0.04)', label: '中性' },
-    { y0: 0.2, y1: 0.4, color: 'rgba(249,115,22,0.05)', label: '偏热' },
-    { y0: 0, y1: 0.2, color: 'rgba(239,68,68,0.06)', label: '极度贪婪' },
+    { y0: 0.8, y1: 1.0, color: 'rgba(14,165,233,0.06)' },
+    { y0: 0.6, y1: 0.8, color: 'rgba(34,197,94,0.05)' },
+    { y0: 0.4, y1: 0.6, color: 'rgba(234,179,8,0.04)' },
+    { y0: 0.2, y1: 0.4, color: 'rgba(249,115,22,0.05)' },
+    { y0: 0, y1: 0.2, color: 'rgba(239,68,68,0.06)' }
   ];
-  bands.forEach(b => {
-    ctx.fillStyle = b.color;
-    ctx.fillRect(pad.left, pad.top + ph * b.y0, pw, ph * (b.y1 - b.y0));
-  });
-
-  // Y-axis labels
+  bands.forEach(b => ctx.fillStyle = b.color, ctx.fillRect(pad.left, pad.top + ph * b.y0, pw, ph * (b.y1 - b.y0)));
   ctx.fillStyle = '#6b7280';
   ctx.font = '10px -apple-system, sans-serif';
   ctx.textAlign = 'right';
@@ -586,30 +627,24 @@ function renderChart() {
     ctx.lineTo(w - pad.right, y);
     ctx.stroke();
   });
-
   if (!historyData || historyData.length < 2) {
     ctx.fillStyle = '#6b7280';
     ctx.textAlign = 'center';
     ctx.font = '13px -apple-system, sans-serif';
-    ctx.fillText('暂无历史数据 — 刷新后将开始记录', w/2, h/2);
+    ctx.fillText(t().noHistory, w / 2, h / 2);
     return;
   }
-
   const data = historyData.slice(-chartDays);
   const values = data.map(d => d.composite);
   const min = Math.max(0, Math.min(...values) - 5);
   const max = Math.min(100, Math.max(...values) + 5);
   const range = max - min || 50;
-
   const getX = i => pad.left + (i / (data.length - 1)) * pw;
   const getY = v => pad.top + ph * (1 - (v - min) / range);
-
-  // Gradient fill
   const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ph);
   grad.addColorStop(0, 'rgba(249,115,22,0.2)');
   grad.addColorStop(0.5, 'rgba(234,179,8,0.12)');
   grad.addColorStop(1, 'rgba(34,197,94,0.08)');
-
   ctx.beginPath();
   ctx.moveTo(getX(0), getY(data[0].composite));
   for (let i = 1; i < data.length; i++) ctx.lineTo(getX(i), getY(data[i].composite));
@@ -618,11 +653,6 @@ function renderChart() {
   ctx.closePath();
   ctx.fillStyle = grad;
   ctx.fill();
-
-  // Line
-  const lineGrad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ph);
-  lineGrad.addColorStop(0, '#f97316');
-  lineGrad.addColorStop(1, '#22c55e');
   ctx.beginPath();
   ctx.moveTo(getX(0), getY(data[0].composite));
   for (let i = 1; i < data.length; i++) {
@@ -636,8 +666,6 @@ function renderChart() {
   ctx.lineWidth = 2;
   ctx.lineJoin = 'round';
   ctx.stroke();
-
-  // Dots (only for recent ones if many)
   const dotStep = data.length > 30 ? Math.ceil(data.length / 20) : 1;
   data.forEach((d, i) => {
     if (i % dotStep !== 0 && i !== data.length - 1) return;
@@ -649,8 +677,6 @@ function renderChart() {
     ctx.lineWidth = i === data.length - 1 ? 2 : 1;
     ctx.stroke();
   });
-
-  // X labels
   ctx.fillStyle = '#6b7280';
   ctx.font = '9px -apple-system, sans-serif';
   ctx.textAlign = 'center';
@@ -663,11 +689,6 @@ function renderChart() {
   });
 }
 
-// ═══════════════════════════════════
-//  MAIN REFRESH
-// ═══════════════════════════════════
-
-// Detect GitHub Pages: load snapshot.json instead of API
 function isGithubPages() {
   return window.location.hostname.includes('github.io') || window.location.hostname.includes('pages.dev');
 }
@@ -684,19 +705,15 @@ async function tryLoadSnapshot() {
     renderSectors(data.sectors || {});
     historyData = Array.isArray(data.history) ? data.history : [];
     renderChart();
-    document.getElementById('updateTime').textContent = (data.timestamp || '').replace('T', ' ');
-    const btn = document.getElementById('refreshBtn');
-    btn.textContent = '📡 Pages 快照';
+    document.getElementById('updateTime').textContent = formatDateTime(data.timestamp || '');
+    setButtonMode('pages');
     return true;
   } catch {
     useFallbackData();
-    const btn = document.getElementById('refreshBtn');
-    btn.textContent = '⚠️ 快照不可用';
+    setButtonMode('snapshot-unavailable');
     return false;
   }
 }
-
-let isRefreshing = false;
 
 async function refreshAll() {
   if (isRefreshing) return;
@@ -707,8 +724,7 @@ async function refreshAll() {
   isRefreshing = true;
   const btn = document.getElementById('refreshBtn');
   btn.disabled = true;
-  btn.textContent = '⟳ 加载中...';
-
+  setButtonMode('loading');
   try {
     const data = await api('/api/temperature');
     if (!data) { useFallbackData(); return; }
@@ -716,89 +732,107 @@ async function refreshAll() {
     renderIndicators(data.indicators || {});
     renderMarketData(data.market_data || {});
     renderPolymarket(data.polymarket || {});
-    document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
-
+    document.getElementById('updateTime').textContent = formatDateTime(new Date().toISOString());
     const hist = await api(`/api/history?days=${Math.max(chartDays, 30)}`);
     historyData = Array.isArray(hist) ? hist : [];
     renderChart();
-
     const sectors = await api('/api/sectors');
     if (sectors) renderSectors(sectors);
+    setButtonMode('refresh');
   } finally {
     isRefreshing = false;
     btn.disabled = false;
-    btn.textContent = '🔄 刷新数据';
+    if (buttonMode === 'loading') setButtonMode('refresh');
   }
 }
 
 function switchChartDays(days) {
   chartDays = days;
-  document.querySelectorAll('.chart-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.days) === days));
+  document.querySelectorAll('.chart-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.days, 10) === days));
   renderChart();
 }
-
-// ═══════════════════════════════════
-//  FALLBACK (when API unavailable)
-// ═══════════════════════════════════
 
 function useFallbackData() {
   const indicators = {
     vix: { name: 'VIX 恐慌指数', value: 18.5, temperature: 38.5, weight: 15 },
     put_call: { name: 'Put/Call 比率', value: 0.82, temperature: 42.0, weight: 12 },
     aaii_spread: { name: 'AAII 牛熊差', value: 5.2, temperature: 42.1, weight: 12 },
-    fear_greed: { name: 'Fear & Greed', value: 52, temperature: 48.0, weight: 10 },
+    fear_greed: { name: 'Fear & Greed 指数', value: 52, temperature: 48.0, weight: 10 },
     yield_spread: { name: '10Y-2Y 利差', value: 0.32, temperature: 47.0, weight: 10 },
     hy_oas: { name: '高收益债利差', value: 3.8, temperature: 61.7, weight: 10 },
     dxy: { name: '美元指数 DXY', value: 104.5, temperature: 58.0, weight: 8 },
     gold: { name: '黄金 XAU', value: 2350, temperature: 53.8, weight: 8 },
     sp500_200ma: { name: '标普500 vs 200MA', value: 8.2, temperature: 72.7, weight: 5 },
     ted_spread: { name: 'TED 利差', value: 0.22, temperature: 6.3, weight: 5 },
-    bitcoin_fg: { name: '比特币 Fear & Greed', value: 55, temperature: 45.0, weight: 5 },
+    bitcoin_fg: { name: '比特币 Fear & Greed', value: 55, temperature: 45.0, weight: 5 }
   };
-
   const composite = Object.values(indicators).reduce((s, i) => s + i.temperature * i.weight, 0) /
     Object.values(indicators).reduce((s, i) => s + i.weight, 0);
-
   renderThermometer(composite);
   renderIndicators(indicators);
-  renderMarketData({
-    sp500_price: 5432, sp500_change: 0.35, vix: 18.5, dxy: 104.5, gold: 2350, us10y: 4.52
-  });
+  renderMarketData({ sp500_price: 5432, sp500_change: 0.35, vix: 18.5, dxy: 104.5, gold: 2350, us10y: 4.52 });
   renderPolymarket({ prediction_market_heat: 55, panel: { fed_decision: { no_change: 82, cut25: 14, cut50: 2, volume24h: 850000 }, fed_cuts: { expected_cuts: 1.2, volume24h: 150000 }, iran_peace: { peace_prob: 24, volume24h: 1300000 }, bitcoin: { heat: 68, title: 'Bitcoin above ___ today?', volume24h: 1800000 } } });
-
-  // Generate fallback history
   const now = Date.now();
   historyData = [];
   for (let i = 89; i >= 0; i--) {
-    const t = now - i * 86400000;
+    const ts = now - i * 86400000;
     const base = 45 + Math.sin(i * 0.12) * 15 + Math.sin(i * 0.05) * 8;
     const noise = (Math.random() - 0.5) * 8;
-    historyData.push({
-      date: new Date(t).toISOString().split('T')[0],
-      composite: Math.round(Math.max(5, Math.min(95, base + noise)))
-    });
+    historyData.push({ date: new Date(ts).toISOString().split('T')[0], composite: Math.round(Math.max(5, Math.min(95, base + noise))) });
   }
   renderChart();
-  document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
-  document.getElementById('refreshBtn').textContent = '🔄 模拟数据';
-  if (!isGithubPages()) {
-    document.getElementById('refreshBtn').onclick = () => { refreshAll(); };
+  document.getElementById('updateTime').textContent = formatDateTime(new Date().toISOString());
+  setButtonMode('fallback');
+}
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('thermo-lang', lang);
+  applyLanguage();
+  renderChart();
+  if (window.__lastSnapshot) {
+    renderThermometer(window.__lastSnapshot.composite);
+    renderIndicators(window.__lastSnapshot.indicators || {});
+    renderMarketData(window.__lastSnapshot.market_data || {});
+    renderPolymarket(window.__lastSnapshot.polymarket || {});
+    renderSectors(window.__lastSnapshot.sectors || {});
+    document.getElementById('updateTime').textContent = formatDateTime(window.__lastSnapshot.timestamp || '');
   }
 }
 
-// ═══════════════════════════════════
-//  INIT
-// ═══════════════════════════════════
+const originalTryLoadSnapshot = tryLoadSnapshot;
+tryLoadSnapshot = async function() {
+  try {
+    const resp = await fetch('./data/snapshot.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('snapshot-not-found');
+    const data = await resp.json();
+    window.__lastSnapshot = data;
+    renderThermometer(data.composite);
+    renderIndicators(data.indicators || {});
+    renderMarketData(data.market_data || {});
+    renderPolymarket(data.polymarket || {});
+    renderSectors(data.sectors || {});
+    historyData = Array.isArray(data.history) ? data.history : [];
+    renderChart();
+    document.getElementById('updateTime').textContent = formatDateTime(data.timestamp || '');
+    setButtonMode('pages');
+    return true;
+  } catch {
+    useFallbackData();
+    setButtonMode('snapshot-unavailable');
+    return false;
+  }
+};
 
-// Resize handler
+document.getElementById('langEn').onclick = () => setLanguage('en');
+document.getElementById('langZh').onclick = () => setLanguage('zh');
+document.querySelectorAll('.chart-btn').forEach(btn => btn.onclick = () => switchChartDays(parseInt(btn.dataset.days, 10)));
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(renderChart, 200);
 });
-
-// On GitHub Pages: load snapshot; only use API refresh when backend is available
-// ── Bootstrap ──
+applyLanguage();
 const refreshBtn = document.getElementById('refreshBtn');
 if (isGithubPages()) {
   refreshBtn.onclick = () => { tryLoadSnapshot(); };
