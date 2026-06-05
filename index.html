@@ -347,9 +347,10 @@ function getChangeColor(change) {
 const API_BASE = '';
 
 async function api(path) {
+  if (isGithubPages()) return null;
   try {
-    const res = await fetch(API_BASE + path);
-    if (!res.ok) throw new Error(String(res.status));
+    const res = await fetch(path, { cache: 'no-store' });
+    if (!res.ok) return null;
     return await res.json();
   } catch {
     return null;
@@ -673,22 +674,25 @@ function isGithubPages() {
 
 async function tryLoadSnapshot() {
   try {
-    const resp = await fetch('./data/snapshot.json?_=' + Date.now());
-    if (!resp.ok) return false;
+    const resp = await fetch('./data/snapshot.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('snapshot-not-found');
     const data = await resp.json();
     renderThermometer(data.composite);
-    renderIndicators(data.indicators);
-    renderMarketData(data.market_data);
+    renderIndicators(data.indicators || {});
+    renderMarketData(data.market_data || {});
     renderPolymarket(data.polymarket || {});
     renderSectors(data.sectors || {});
+    historyData = Array.isArray(data.history) ? data.history : [];
     renderChart();
     document.getElementById('updateTime').textContent = (data.timestamp || '').replace('T', ' ');
-    document.getElementById('refreshBtn').textContent = '📡 Pages 快照';
+    const btn = document.getElementById('refreshBtn');
+    btn.textContent = '📡 Pages 快照';
     return true;
-  } catch { 
+  } catch {
     useFallbackData();
-    document.getElementById('refreshBtn').textContent = '⚠️ 快照不可用';
-    return false; 
+    const btn = document.getElementById('refreshBtn');
+    btn.textContent = '⚠️ 快照不可用';
+    return false;
   }
 }
 
@@ -696,7 +700,6 @@ let isRefreshing = false;
 
 async function refreshAll() {
   if (isRefreshing) return;
-  // Guard: on GitHub Pages, load snapshot instead of hitting API
   if (isGithubPages()) {
     await tryLoadSnapshot();
     return;
@@ -705,48 +708,27 @@ async function refreshAll() {
   const btn = document.getElementById('refreshBtn');
   btn.disabled = true;
   btn.textContent = '⟳ 加载中...';
-  const errBar = document.getElementById('errorBar');
-  errBar.style.display = 'none';
 
   try {
-    // Fetch temperature and indicators
     const data = await api('/api/temperature');
     if (!data) { useFallbackData(); return; }
     renderThermometer(data.composite);
-    renderIndicators(data.indicators);
-    renderMarketData(data.market_data);
+    renderIndicators(data.indicators || {});
+    renderMarketData(data.market_data || {});
     renderPolymarket(data.polymarket || {});
-    renderChart();
     document.getElementById('updateTime').textContent = new Date().toLocaleString('zh-CN');
 
-    // Fetch history
-    historyData = await api(`/api/history?days=${Math.max(chartDays, 30)}`);
+    const hist = await api(`/api/history?days=${Math.max(chartDays, 30)}`);
+    historyData = Array.isArray(hist) ? hist : [];
     renderChart();
-  } catch (e) {
-    console.error('Refresh error:', e);
-    errBar.textContent = `⚠️ 数据获取失败：${e.message}。使用模拟数据展示。`;
-    errBar.style.display = 'block';
-    // Fallback to simulated data
-    useFallbackData();
-  }
 
-  // Fetch sectors (independent)
-  try {
     const sectors = await api('/api/sectors');
-    renderSectors(sectors);
-  } catch (e) { console.error('Sector fetch error:', e); }
-
-  // Independent polymarket data fetch
-  try {
-    const pm = await api('/api/polymarket');
-    if (pm) renderPolymarket(pm);
-  } catch (e) { console.error('Polymarket fetch error:', e); }
-    console.error('Sector fetch error:', e);
+    if (sectors) renderSectors(sectors);
+  } finally {
+    isRefreshing = false;
+    btn.disabled = false;
+    btn.textContent = '🔄 刷新数据';
   }
-
-  isRefreshing = false;
-  btn.disabled = false;
-  btn.textContent = '🔄 刷新数据';
 }
 
 function switchChartDays(days) {
@@ -817,13 +799,14 @@ window.addEventListener('resize', () => {
 
 // On GitHub Pages: load snapshot; only use API refresh when backend is available
 // ── Bootstrap ──
+const refreshBtn = document.getElementById('refreshBtn');
 if (isGithubPages()) {
+  refreshBtn.onclick = () => { tryLoadSnapshot(); };
   tryLoadSnapshot();
-  document.getElementById('refreshBtn').onclick = () => { tryLoadSnapshot(); };
 } else {
+  refreshBtn.onclick = () => { refreshAll(); };
   refreshAll();
   setInterval(refreshAll, 300000);
-  document.getElementById('refreshBtn').onclick = () => { refreshAll(); };
 }
 </script>
 </body>
