@@ -679,7 +679,9 @@ async function tryLoadSnapshot() {
     renderSectors(data.sectors || {});
     renderChart();
     document.getElementById('updateTime').textContent = (data.timestamp || '').replace('T', ' ');
-    document.getElementById('refreshBtn').textContent = '📡 静态快照';
+    document.getElementById('refreshBtn').textContent = '📡 Pages 快照';
+    document.getElementById('refreshBtn').style.cursor = 'default';
+    document.getElementById('refreshBtn').onclick = () => { tryLoadSnapshot(); };
     return true;
   } catch { return false; }
 }
@@ -791,14 +793,14 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(renderChart, 200);
 });
 
-// On first load, try snapshot first; if that fails, try API
+// On GitHub Pages: load snapshot; only use API refresh when backend is available
 if (isGithubPages()) {
   tryLoadSnapshot();
 } else {
   refreshAll();
+  // Auto-refresh every 5 minutes (local backend mode only)
+  setInterval(refreshAll, 300000);
 }
-// Auto-refresh every 5 minutes (only relevant when backend available)
-setInterval(refreshAll, 300000);
 </script>
 </body>
 </html>
