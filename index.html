@@ -692,6 +692,11 @@ let isRefreshing = false;
 
 async function refreshAll() {
   if (isRefreshing) return;
+  // Guard: on GitHub Pages, load snapshot instead of hitting API
+  if (isGithubPages()) {
+    await tryLoadSnapshot();
+    return;
+  }
   isRefreshing = true;
   const btn = document.getElementById('refreshBtn');
   btn.disabled = true;
@@ -802,11 +807,9 @@ window.addEventListener('resize', () => {
 // On GitHub Pages: load snapshot; only use API refresh when backend is available
 // ── Bootstrap ──
 if (isGithubPages()) {
-  // GitHub Pages: load from static snapshot, no live API
   tryLoadSnapshot();
   document.getElementById('refreshBtn').onclick = () => { tryLoadSnapshot(); };
 } else {
-  // Local backend: live API with auto‑refresh
   refreshAll();
   setInterval(refreshAll, 300000);
   document.getElementById('refreshBtn').onclick = () => { refreshAll(); };
