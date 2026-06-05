@@ -197,4 +197,6 @@ open http://localhost:8866
 
 ## License
 
-MIT
+This project is released under the [MIT License](LICENSE).
+
+See also: [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · [`CHANGELOG.md`](CHANGELOG.md)
