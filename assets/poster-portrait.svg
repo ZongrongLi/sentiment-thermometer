@@ -1,0 +1,84 @@
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0e14"/>
+      <stop offset="1" stop-color="#141b29"/>
+    </linearGradient>
+    <linearGradient id="thermo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ef4444"/>
+      <stop offset="0.35" stop-color="#f97316"/>
+      <stop offset="0.65" stop-color="#eab308"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+    <linearGradient id="trend" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f97316" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#22c55e" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <rect x="64" y="80" width="952" height="1760" rx="48" fill="#10141d" stroke="#1e2634"/>
+
+  <g transform="translate(96 160)" font-family="Inter, Arial, sans-serif">
+    <text fill="#9ca3af" font-size="28" letter-spacing="8">OPEN SOURCE · 开源</text>
+    <text y="120" fill="#e8ecf2" font-size="92" font-weight="800">Global Sentiment</text>
+    <text y="220" fill="#f97316" font-size="92" font-weight="800">Thermometer</text>
+    <text y="298" fill="#c8cdd6" font-size="40" font-weight="600">全球情绪温度计</text>
+    <text y="360" fill="#9ca3af" font-size="28">US macro mood · 12 weighted signals</text>
+  </g>
+
+  <g transform="translate(120 580)">
+    <rect width="368" height="700" rx="44" fill="#0f141c" stroke="#1e2634"/>
+    <text x="184" y="64" text-anchor="middle" fill="#6b7280" font-family="Inter, Arial, sans-serif" font-size="22" letter-spacing="4">COMPOSITE</text>
+
+    <rect x="156" y="100" width="56" height="420" rx="28" fill="#1e2634" stroke="#2a3445" stroke-width="3"/>
+    <rect x="156" y="240" width="56" height="280" rx="28" fill="url(#thermo)"/>
+    <circle cx="184" cy="540" r="68" fill="#f97316" stroke="#2a3445" stroke-width="3"/>
+
+    <text x="184" y="640" text-anchor="middle" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="92" font-weight="800">58°</text>
+    <text x="184" y="676" text-anchor="middle" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="700">Neutral · 中性</text>
+  </g>
+
+  <g transform="translate(540 580)" font-family="Inter, Arial, sans-serif">
+    <rect width="420" height="100" rx="22" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="28" y="46" fill="#6b7280" font-size="22">S&amp;P 500</text>
+    <text x="28" y="84" fill="#e8ecf2" font-size="40" font-weight="800">7,584.31</text>
+    <text x="288" y="84" fill="#22c55e" font-size="24" font-weight="700">+0.34%</text>
+
+    <rect y="124" width="420" height="100" rx="22" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="28" y="170" fill="#6b7280" font-size="22">VIX Fear Index</text>
+    <text x="28" y="208" fill="#22c55e" font-size="40" font-weight="800">15.65</text>
+
+    <rect y="248" width="420" height="100" rx="22" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="28" y="294" fill="#6b7280" font-size="22">Polymarket Heat</text>
+    <text x="28" y="332" fill="#f97316" font-size="40" font-weight="800">60.9°</text>
+
+    <rect y="372" width="420" height="100" rx="22" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="28" y="418" fill="#6b7280" font-size="22">Fed decision (no change)</text>
+    <text x="28" y="456" fill="#e8ecf2" font-size="40" font-weight="800">87.0%</text>
+
+    <rect y="496" width="420" height="100" rx="22" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="28" y="542" fill="#6b7280" font-size="22">US-Iran peace odds</text>
+    <text x="28" y="580" fill="#ef4444" font-size="40" font-weight="800">31.0%</text>
+
+    <rect y="620" width="420" height="80" rx="22" fill="#1a1f2b" stroke="#1e2634"/>
+    <text x="28" y="668" fill="#9ca3af" font-size="22" font-weight="600">EN / 中文 toggle · auto refresh 5 min</text>
+  </g>
+
+  <g transform="translate(120 1340)" font-family="Inter, Arial, sans-serif">
+    <text fill="#9ca3af" font-size="24" letter-spacing="4">SENTIMENT TREND</text>
+    <rect y="28" width="840" height="200" rx="28" fill="#0f141c" stroke="#1e2634"/>
+    <path d="M40 200 C140 130, 240 170, 320 110 S520 130, 640 80 S780 90, 800 130" stroke="#f97316" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M40 200 C140 130, 240 170, 320 110 S520 130, 640 80 S780 90, 800 130 L800 220 L40 220 Z" fill="url(#trend)"/>
+  </g>
+
+  <g transform="translate(120 1620)" font-family="Inter, Arial, sans-serif">
+    <text fill="#6b7280" font-size="24">Demo</text>
+    <text y="48" fill="#e8ecf2" font-size="32" font-weight="800">zongrongli.github.io/sentiment-thermometer</text>
+    <text y="120" fill="#6b7280" font-size="24">Repo</text>
+    <text y="168" fill="#e8ecf2" font-size="32" font-weight="800">github.com/ZongrongLi/sentiment-thermometer</text>
+  </g>
+
+  <g transform="translate(96 1850)" font-family="Inter, Arial, sans-serif">
+    <text fill="#6b7280" font-size="18">Educational use only · 仅供学习 · Not financial advice · 不构成投资建议</text>
+  </g>
+</svg>
